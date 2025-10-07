@@ -3,7 +3,7 @@ pipeline{
     environment{
         VENV_DIR = 'venv'
         GCP_PROJECT = 'triple-acre-472518-h7'
-        GCLOUD_PATH = '/var/jenkins-home/google-cloud-sdk/bin'
+        GCLOUD_PATH = "/var/jenkins_home/google-cloud-sdk/bin"
     }
     stages{
         stage('Cloning Github repo to Jenkins'){
@@ -29,7 +29,7 @@ pipeline{
         }
         stage('Building and Pushing Docker Image to GCR'){
             steps{
-                withCredentials([file(credentialsId: 'GCP-key' , variable : 'GOOGLE_APPLICATION_CREDENTIALS')]){
+                withCredentials([file(credentialsId: 'GCP-key', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
                     script{
                         echo 'Building and Pushing Docker Image to GCR.............'
                         sh '''
