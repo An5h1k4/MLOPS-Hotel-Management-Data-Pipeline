@@ -30,22 +30,33 @@ pipeline{
         
         stage('Building and Pushing Docker Image to GCR'){
             steps{
-                withCredentials([file(credentialsId: 'gcp-key' , variable : 'GOOGLE_APPLICATION_CREDENTIALS')]){
-                    script{
+                withCredentials([file(credentialsId: 'gcp-key', variable: 'GCP_KEY_FILE')]) {
+                    script {
                         echo 'Building and Pushing Docker Image to GCR.............'
+                        
+                        // Use triple single quotes to let shell expand variables at runtime
                         sh '''
+                        # Add gcloud to PATH
                         export PATH=$PATH:/var/jenkins_home/google-cloud-sdk/bin
 
-                        gcloud auth activate-service-account --key-file=${GOOGLE_APPLICATION_CREDENTIALS}
+                        # Debug: ensure the GCP key file exists
+                        echo "GCP key file path: $GCP_KEY_FILE"
+                        ls -l "$GCP_KEY_FILE"
 
-                        gcloud config set project ${GCP_PROJECT}
+                        # Authenticate with GCP
+                        gcloud auth activate-service-account --key-file="$GCP_KEY_FILE"
 
+                        # Set the GCP project
+                        gcloud config set project $GCP_PROJECT
+
+                        # Configure Docker to use gcloud credentials
                         gcloud auth configure-docker --quiet
 
-                        docker build -t gcr.io/${GCP_PROJECT}/ml-project:latest .
+                        # Build Docker image
+                        docker build -t gcr.io/$GCP_PROJECT/ml-project:latest .
 
-                        docker push gcr.io/${GCP_PROJECT}/ml-project:latest 
-
+                        # Push Docker image to GCR
+                        docker push gcr.io/$GCP_PROJECT/ml-project:latest
                         '''
                     }
                 }
