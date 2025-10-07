@@ -27,6 +27,17 @@ pipeline{
                 }
             }
         }
+        stages {
+        stage('Test GCP Credential') {
+            steps {
+                withCredentials([file(credentialsId: 'gcp-key', variable: 'GCP_KEY_FILE')]) {
+                    sh 'echo "File path: $GCP_KEY_FILE"'
+                    sh 'ls -l $GCP_KEY_FILE'
+                    sh 'cat $GCP_KEY_FILE | head -n 5'
+                }
+            }
+        }
+    }
         stage('Building and Pushing Docker Image to GCR'){
             steps{
                 withCredentials([file(credentialsId : 'gcp-key', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
